@@ -2,7 +2,6 @@ from Customer import *
 from Path import *
 import random
 import time
-import datetime
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -11,26 +10,48 @@ if __name__ == '__main__':
     shop = []
 
 # loop for customer entering the shop
-while i < 2:
+while i < 1:
+    # GET TWO CART FOR TWO CUSTOMER ENTERING
+    cart = random.sample(Customer.customers, 2)
+    # print('Customer ID: ' + str(cart[0]))
+    # print('Customer ID: ' + str(cart[1]))
 
-    cart = random.sample(Customer.customers, 1)
-    print('Customer ID: ' + str(cart))
-    shop.append(cart)
+    # ADD CART IN THE SHOP
+    shop.append(cart[0])
+    shop.append(cart[1])
+    print("Customer with cart id {}, entered at {}".format(cart[0], timeNow()))
+    print("Customer with cart id {}, entered at {}".format(cart[1], timeNow()))
 
-    now = datetime.datetime.now()
-    datetime1 = now.strftime("%H:%M:%S:%f %p")
-    print("Customer with cart id {}, entered at {}".format(cart[0], datetime1))
-    selectedPath = random.sample(Path.path, 1)
-    cust = Customer(selectedPath)
-    print("And the selected path is {}".format(selectedPath))
+    selPath0 = random.sample(Path.path, 1)
+    selPath1 = random.sample(Path.path, 1)
 
-    for k in selectedPath:
-        cust.move()
+    # Assign path to the customer
+    cust0 = Customer(selPath0)
+    cust1 = Customer(selPath1)
 
-    # time.sleep(4)
-    i += 1
+    print("Customer of id {} has path {}".format(cart[0], selPath0))
+    print("Customer of id {} has path {}".format(cart[1], selPath1))
+
+    if len(selPath0) > len(selPath1):
+        max = len(selPath0)
+    else:
+        max = len(selPath1)
+
+    a = 0
+    while a < max:
+        cust0.move()
+        cust1.move()
+        a += 1
+
+    # AFTER THE END OF LOOP THE CUSTOMER GOES TO CHECK OUT
+    time.sleep(random.randrange(0, 7))
+    print("Customer with cart id {} is at the checkout, at time {}".format(
+        shop[0], timeNow()))
     time.sleep(random.randrange(0, 5))
     print("Customer with cart id {} is at the checkout, at time {}".format(
-        shop[0], datetime1))
-    print(" ")
+        shop[1], timeNow()))
+
     shop.pop(0)
+    print(" ")
+
+    i += 1
