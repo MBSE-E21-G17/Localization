@@ -1,6 +1,6 @@
 
 class Customer:
-def __init__(self,cur_pos,speed,PATH):
+    def __init__(self,cur_pos,speed,PATH):
         self.cur_pos = cur_pos
         self.speed = 1
         self.est_pos = (0,0)
