@@ -10,18 +10,20 @@ def timeNow():
 
 
 class Customer:
+    customers = [1, 2, 3]
+
     def __init__(self, PATH):
         self.PATH = PATH
-        self.cur_pos = PATH[0]
-        self.est_pos = (0, 0)
-        self._path_ind = 0
+        self.timeTaken = 1
 
-    def move(self):
-        for p in self.PATH:
-            for a in p:
-                self.cur_pos = a
-                time.sleep(random.randrange(1, 10))
-                print("Current position is : {}, at time {}".format(
-                    self.cur_pos, timeNow()))
+    def move(self, customer):
+        for g in self.PATH:
+            print(" ")
+            for p in g:
+                # print(g[2])
+                if (p[2] == self.timeTaken):
+                    print("At time {} seconds, customer is at ({},{})".format(
+                        p[2], p[0], p[1]))
+                self.timeTaken += 1
 
-    customers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            # time.sleep(random.randrange(1, 10))
