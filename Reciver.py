@@ -16,7 +16,7 @@ class Reciver:
             cust_pos = position of customer when sending signal
         """
         
-        tmp = [cust_id] #The signal id
+        tmp = [(cust_id,self._distance(cust_pos))] #The signal id
         if len(self.Data_result) == 0: #if first signal to be recived
             self.Data_result += tmp
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         
         if cust2_signal_rate == 0 or cust2_signaling > 0:
             print("CUST 2 SIGNALING")
-            Recivers[0].append_signal(2,(2,3))
+            Recivers[0].append_signal(2,(5,5))
             cust2_signaling = (cust2_signaling + 1) % SIGNAL_TIME
         Update_recivers(Recivers)
         #update_customers(Customers)

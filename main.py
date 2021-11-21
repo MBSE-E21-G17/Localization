@@ -1,5 +1,6 @@
 from Customer import *
 from Path import *
+from Reciver import *
 import random
 import time
 
