@@ -72,6 +72,8 @@ if __name__ == "__main__":
 
 
     Recivers = Init_Recivers(N,SIGNAL_STRENGHT)
+    #Customers = Spawn_customer()
+
     cust1_signal_rate = 2
     cust1_signaling = 0
 
@@ -83,6 +85,7 @@ if __name__ == "__main__":
         print(i)
         if cust1_signal_rate == 0 or cust1_signaling > 0:
             print("CUST 1 SIGNALING")
+            #Rcivers[0].append_signal(Cust[0].id, Cust[0].pos)
             Recivers[0].append_signal(1,(2,3))
             cust1_signaling = (cust1_signaling + 1) % SIGNAL_TIME
         
@@ -91,6 +94,7 @@ if __name__ == "__main__":
             Recivers[0].append_signal(2,(2,3))
             cust2_signaling = (cust2_signaling + 1) % SIGNAL_TIME
         Update_recivers(Recivers)
+        #update_customers(Customers)
         cust1_signal_rate = (cust1_signal_rate + 1) % SIGNAL_RATE
         cust2_signal_rate = (cust2_signal_rate + 1) % SIGNAL_RATE
     print(Recivers[0].Data_result)
