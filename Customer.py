@@ -15,7 +15,7 @@ class Customer:
         self.cur_pos = PATH[0]
         #self.est_pos = (0, 0)
         self._path_ind = 0
-        self.cust_id = cust_id
+        self.id = cust_id
         self.signal_cycle = 0
         self.signaling = 0
 

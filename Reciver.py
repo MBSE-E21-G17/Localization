@@ -61,11 +61,16 @@ def Init_Recivers(N,ts):
         Recivers[i] = Reciver(rand.randrange(0,5),rand.randrange(0,5),ts)
     return Recivers
 
+"""
+def Append_signal_to_recivers(Recivers,Customer)
+    for i in range(len(Recivers)):
+        Recivers[i].append_signa(Customer.id, Customer.pos)
+"""
 
 if __name__ == "__main__":
     
     rand.seed(2)
-    N = 1
+    N = 3
     SIGNAL_RATE = 8 #How long time passes between signals
     SIGNAL_TIME = 3 #How long each signal lasts, transmission time
     SIGNAL_STRENGHT = 100 #Radius of reciver signaling space
