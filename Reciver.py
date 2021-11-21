@@ -58,7 +58,12 @@ def Update_recivers(Recivers):
 def Init_Recivers(N,ts):
     Recivers = [0]*N
     for i in range(0,N):
-        Recivers[i] = Reciver(rand.randrange(0,5),rand.randrange(0,5),ts)
+        Recivers[i] = Reciver(rand.randrange(0,5),rand.randrange(0,5),50)
+        print("***********")
+        for x in Recivers:
+            print(x)
+        print("***********")
+
     return Recivers
 
 
