@@ -27,7 +27,7 @@ class Customer:
         self.signal_cycle = (self.signal_cycle + 1) % Signal_rate
 
         if self.signal_cycle == 0 or self.signaling > 0:
-            self.signaling = (self.signaling + 1) % Singal_time
+            self.signaling = (self.signaling + 1) % Signal_time
         
         """
         for p in self.PATH:

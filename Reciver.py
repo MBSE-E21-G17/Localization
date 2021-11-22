@@ -1,5 +1,5 @@
 import numpy as np
-import random as rand
+import random
 
 class Reciver:
     def __init__(self,pos_x,pos_y, Signal_radius):
@@ -51,6 +51,31 @@ class Reciver:
             self._time_index += 1
 
 
+def drawCellTowers():
+    x1 = random.randint(-150, -80)
+    y1 = random.randint(-150, 150)
+    x2 = random.randint(80, 150)
+    y2 = random.randint(20, 150)
+    x3 = random.randint(80, 150)
+    y3 = random.randint(-150, -20)
+    x = random.randint(-60, 60)
+    y = random.randint(-60, 60)
+    r1 = ((x - x1) ** 2 + (y - y1) ** 2) ** 0.5
+    r2 = ((x - x2) ** 2 + (y - y2) ** 2) ** 0.5
+    r3 = ((x - x3) ** 2 + (y - y3) ** 2) ** 0.5
+    return x1,y1,r1,x2,y2,r2,x3,y3,r3
+
+def est_Pos(x1,y1,r1,x2,y2,r2,x3,y3,r3):
+  A = 2*x2 - 2*x1
+  B = 2*y2 - 2*y1
+  C = r1**2 - r2**2 - x1**2 + x2**2 - y1**2 + y2**2
+  D = 2*x3 - 2*x2
+  E = 2*y3 - 2*y2
+  F = r2**2 - r3**2 - x2**2 + x3**2 - y2**2 + y3**2
+  x = (C*E - F*B) / (E*A - B*D)
+  y = (C*D - A*F) / (B*D - A*E)
+  return x,y
+
 def Update_recivers(Recivers):
     for i in  range(len(Recivers)):
         Recivers[i].update()
@@ -58,7 +83,7 @@ def Update_recivers(Recivers):
 def Init_Recivers(N,ts):
     Recivers = [0]*N
     for i in range(0,N):
-        Recivers[i] = Reciver(rand.randrange(0,5),rand.randrange(0,5),ts)
+        Recivers[i] = Reciver(random.randrange(0,6),random.randrange(0,6),ts)
     return Recivers
 
 """
@@ -69,8 +94,8 @@ def Append_signal_to_recivers(Recivers,Customer)
 
 if __name__ == "__main__":
     
-    rand.seed(2)
-    N = 3
+    random.seed(2)
+    N = 5
     SIGNAL_RATE = 8 #How long time passes between signals
     SIGNAL_TIME = 3 #How long each signal lasts, transmission time
     SIGNAL_STRENGHT = 100 #Radius of reciver signaling space
@@ -90,17 +115,23 @@ if __name__ == "__main__":
         print(i)
         if cust1_signal_rate == 0 or cust1_signaling > 0:
             print("CUST 1 SIGNALING")
+            # print("----------")
+            for j in range(0, N):
+                Recivers[j].append_signal(1, (2, 3))
+            # print("----------")
+
             #Rcivers[0].append_signal(Cust[0].id, Cust[0].pos)
-            Recivers[0].append_signal(1,(2,3))
+            # Recivers[0].append_signal(1,(2,3))
             cust1_signaling = (cust1_signaling + 1) % SIGNAL_TIME
         
         if cust2_signal_rate == 0 or cust2_signaling > 0:
             print("CUST 2 SIGNALING")
-            Recivers[0].append_signal(2,(5,5))
+            for k in range(0, N):
+                Recivers[k].append_signal(2,(5,5))
             cust2_signaling = (cust2_signaling + 1) % SIGNAL_TIME
         Update_recivers(Recivers)
         #update_customers(Customers)
         cust1_signal_rate = (cust1_signal_rate + 1) % SIGNAL_RATE
         cust2_signal_rate = (cust2_signal_rate + 1) % SIGNAL_RATE
-    print(Recivers[0].Data_result)
-        
+        for m in range(0, N):
+            print(Recivers[m].Data_result)
