@@ -26,8 +26,13 @@ class Reciver:
                 self.Data_result += tmp
             else:
                 print("OVERLAP IN SIGNAL")
-                self.Data_result[self._time_index] = 0  
-            
+                self.Data_result[self._time_index] = 0
+
+    def __str__(self) -> str:
+        return str(self.Pos)
+
+    def __repr__(self):
+        return self.__str__()
 
     def clear_signal(self, ts_1, ts_2):
         pass
@@ -50,31 +55,53 @@ class Reciver:
             self.Data_result.append(0)
             self._time_index += 1
 
+#
+# def drawCellTowers():
+#     x1 = int(str(Recivers)[2])
+#     y1 = int(str(Recivers)[5])
+#     x2 = int(str(Recivers)[10])
+#     y2 = int(str(Recivers)[13])
+#     x3 = int(str(Recivers)[18])
+#     y3 = int(str(Recivers)[21])
+#     x = random.randint(1, 4)
+#     y = random.randint(1, 4)
+#     # print("€€€€€€€€€€€€€")
+#     # print(x, y)
+#     # print("€€€€€€€€€€€€€")
+#     r1 = ((x - x1) ** 2 + (y - y1) ** 2) ** 0.5
+#     r2 = ((x - x2) ** 2 + (y - y2) ** 2) ** 0.5
+#     r3 = ((x - x3) ** 2 + (y - y3) ** 2) ** 0.5
+#     return x1,y1,r1,x2,y2,r2,x3,y3,r3
 
-def drawCellTowers():
-    x1 = random.randint(-150, -80)
-    y1 = random.randint(-150, 150)
-    x2 = random.randint(80, 150)
-    y2 = random.randint(20, 150)
-    x3 = random.randint(80, 150)
-    y3 = random.randint(-150, -20)
-    x = random.randint(-60, 60)
-    y = random.randint(-60, 60)
+def est_Pos():
+    x1 = int(str(Recivers)[2])
+    y1 = int(str(Recivers)[5])
+    x2 = int(str(Recivers)[10])
+    y2 = int(str(Recivers)[13])
+    x3 = int(str(Recivers)[18])
+    y3 = int(str(Recivers)[21])
+    # x = random.random()*10
+    # y = random.random()*10
+    x = random.randrange(3, 5)
+    y = random.randrange(5, 6)
+    # x = 4
+    # y = 3
+    print("€€€€€€€€€€€€€")
+    print(x, y)
+    print("€€€€€€€€€€€€€")
     r1 = ((x - x1) ** 2 + (y - y1) ** 2) ** 0.5
     r2 = ((x - x2) ** 2 + (y - y2) ** 2) ** 0.5
     r3 = ((x - x3) ** 2 + (y - y3) ** 2) ** 0.5
-    return x1,y1,r1,x2,y2,r2,x3,y3,r3
-
-def est_Pos(x1,y1,r1,x2,y2,r2,x3,y3,r3):
-  A = 2*x2 - 2*x1
-  B = 2*y2 - 2*y1
-  C = r1**2 - r2**2 - x1**2 + x2**2 - y1**2 + y2**2
-  D = 2*x3 - 2*x2
-  E = 2*y3 - 2*y2
-  F = r2**2 - r3**2 - x2**2 + x3**2 - y2**2 + y3**2
-  x = (C*E - F*B) / (E*A - B*D)
-  y = (C*D - A*F) / (B*D - A*E)
-  return x,y
+    # -----Triliteration CODE ------
+    A = 2*x2 - 2*x1
+    B = 2*y2 - 2*y1
+    C = r1**2 - r2**2 - x1**2 + x2**2 - y1**2 + y2**2
+    D = 2*x3 - 2*x2
+    E = 2*y3 - 2*y2
+    F = r2**2 - r3**2 - x2**2 + x3**2 - y2**2 + y3**2
+    x0 = (C*E - F*B) / (E*A - B*D)
+    y0 = (C*D - A*F) / (B*D - A*E)
+    return x0, y0
 
 def Update_recivers(Recivers):
     for i in  range(len(Recivers)):
@@ -83,7 +110,8 @@ def Update_recivers(Recivers):
 def Init_Recivers(N,ts):
     Recivers = [0]*N
     for i in range(0,N):
-        Recivers[i] = Reciver(random.randrange(0,6),random.randrange(0,6),ts)
+        Recivers[i] = Reciver(random.randrange(1,6),random.randrange(1,6),ts)
+    print(str(Recivers))
     return Recivers
 
 """
@@ -93,7 +121,6 @@ def Append_signal_to_recivers(Recivers,Customer)
 """
 
 if __name__ == "__main__":
-    
     random.seed(2)
     N = 5
     SIGNAL_RATE = 8 #How long time passes between signals
@@ -102,6 +129,11 @@ if __name__ == "__main__":
 
 
     Recivers = Init_Recivers(N,SIGNAL_STRENGHT)
+    m, y = est_Pos()
+    print("€€€€€€€€€€€")
+    print(m)
+    print(y)
+    print("€€€€€€€€€€€")
     #Customers = Spawn_customer()
 
     cust1_signal_rate = 2
