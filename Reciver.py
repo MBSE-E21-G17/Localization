@@ -28,7 +28,7 @@ class Reciver:
                 print("OVERLAP IN SIGNAL")
                 self.Data_result[self._time_index] = 0
 
-    def __str__(self) -> str:
+    def __str__(self):
         return str(self.Pos)
 
     def __repr__(self):
@@ -65,30 +65,26 @@ class Reciver:
 #     y3 = int(str(Recivers)[21])
 #     x = random.randint(1, 4)
 #     y = random.randint(1, 4)
-#     # print("€€€€€€€€€€€€€")
 #     # print(x, y)
-#     # print("€€€€€€€€€€€€€")
 #     r1 = ((x - x1) ** 2 + (y - y1) ** 2) ** 0.5
 #     r2 = ((x - x2) ** 2 + (y - y2) ** 2) ** 0.5
 #     r3 = ((x - x3) ** 2 + (y - y3) ** 2) ** 0.5
 #     return x1,y1,r1,x2,y2,r2,x3,y3,r3
 
-def est_Pos():
-    x1 = int(str(Recivers)[2])
-    y1 = int(str(Recivers)[5])
-    x2 = int(str(Recivers)[10])
-    y2 = int(str(Recivers)[13])
-    x3 = int(str(Recivers)[18])
-    y3 = int(str(Recivers)[21])
+def est_Pos(Reciver1,Reciver2,Reciver3):
+    x1 = Reciver1.Pos[0]
+    y1 = Reciver1.Pos[1]
+    x2 = Reciver2.Pos[0]
+    y2 = Reciver2.Pos[1]
+    x3 = Reciver3.Pos[0]
+    y3 = Reciver3.Pos[1]
     # x = random.random()*10
     # y = random.random()*10
     x = random.randrange(3, 5)
     y = random.randrange(5, 6)
     # x = 4
     # y = 3
-    print("€€€€€€€€€€€€€")
     print(x, y)
-    print("€€€€€€€€€€€€€")
     r1 = ((x - x1) ** 2 + (y - y1) ** 2) ** 0.5
     r2 = ((x - x2) ** 2 + (y - y2) ** 2) ** 0.5
     r3 = ((x - x3) ** 2 + (y - y3) ** 2) ** 0.5
@@ -110,7 +106,7 @@ def Update_recivers(Recivers):
 def Init_Recivers(N,ts):
     Recivers = [0]*N
     for i in range(0,N):
-        Recivers[i] = Reciver(random.randrange(1,6),random.randrange(1,6),ts)
+        Recivers[i] = Reciver(random.randrange(1,50),random.randrange(1,50),ts)
     print(str(Recivers))
     return Recivers
 
@@ -129,11 +125,9 @@ if __name__ == "__main__":
 
 
     Recivers = Init_Recivers(N,SIGNAL_STRENGHT)
-    m, y = est_Pos()
-    print("€€€€€€€€€€€")
+    m, y = est_Pos(Recivers[0],Recivers[1],Recivers[2])
     print(m)
     print(y)
-    print("€€€€€€€€€€€")
     #Customers = Spawn_customer()
 
     cust1_signal_rate = 2
@@ -155,15 +149,20 @@ if __name__ == "__main__":
             #Rcivers[0].append_signal(Cust[0].id, Cust[0].pos)
             # Recivers[0].append_signal(1,(2,3))
             cust1_signaling = (cust1_signaling + 1) % SIGNAL_TIME
-        
+        """ 
         if cust2_signal_rate == 0 or cust2_signaling > 0:
             print("CUST 2 SIGNALING")
             for k in range(0, N):
                 Recivers[k].append_signal(2,(5,5))
             cust2_signaling = (cust2_signaling + 1) % SIGNAL_TIME
+        """
+        
         Update_recivers(Recivers)
         #update_customers(Customers)
         cust1_signal_rate = (cust1_signal_rate + 1) % SIGNAL_RATE
         cust2_signal_rate = (cust2_signal_rate + 1) % SIGNAL_RATE
-        for m in range(0, N):
-            print(Recivers[m].Data_result)
+    for m in range(0, N):
+        print(Recivers[m].Data_result)
+
+
+
