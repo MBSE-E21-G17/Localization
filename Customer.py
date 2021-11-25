@@ -1,19 +1,10 @@
-import datetime
-import random
-import time
-
-
-def timeNow():
-    now = datetime.datetime.now()
-    tid = now.strftime("%H:%M:%S:%f %p")
-    return tid
-
+import numpy as np
 
 class Customer:
     def __init__(self, PATH,cust_id):
-        self.PATH = PATH[0]
-        self.cur_pos = PATH[0][0]
-        self.est_pos = [(0,0)]
+        self.PATH = PATH
+        self.cur_pos = PATH[0]
+        self.est_pos = [PATH[0]] #first estimation is at entrance
         self._path_ind = 0
         self.id = cust_id
         self.signal_cycle = 0
@@ -31,7 +22,10 @@ class Customer:
 
     def append_est_pos(self,pos):
         tmp = [pos]
-        self.est_pos += tmp #append to end of array
+        if np.isfinite(pos[0]) and np.isfinite(pos[1]):
+            self.est_pos += tmp #append to end of array
+        else:
+            self.est_pos.append(self.est_pos[self._time_index-1])
 
     def update(self, Signal_rate, Signal_time):
         if not self.END:
@@ -49,12 +43,5 @@ class Customer:
 
     def is_signaling(self):
         return (self.signal_cycle == 0 or self.signaling > 0) and not self.END
-        """
-        for p in self.PATH:
-            for a in p:
-                self.cur_pos = a
-                time.sleep(random.randrange(1, 10))
-                print("Current position is : {}, at time {}".format(
-                    self.cur_pos, timeNow()))
-        """
-    customers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      
+    

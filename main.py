@@ -1,12 +1,14 @@
 from Customer import *
 from Path import *
 from Reciver import *
-from matplotlib.pylab import (figure, plot, xlabel, ylabel, legend, title, subplot, show)
+from matplotlib.pylab import (figure, plot, xlabel, ylabel, legend, title, subplots, show)
 import random
 import time
 import matplotlib.pyplot as plt
 import numpy as np
 import simpy
+
+from parameters import *
 
 
 def est_Pos(Reciver1,Reciver2,Reciver3):
@@ -28,6 +30,7 @@ def est_Pos(Reciver1,Reciver2,Reciver3):
     D = 2*x3 - 2*x2
     E = 2*y3 - 2*y2
     F = r2**2 - r3**2 - x2**2 + x3**2 - y2**2 + y3**2
+    
     x0 = (C*E - F*B) / (E*A - B*D)
     y0 = (C*D - A*F) / (B*D - A*E)
     return x0, y0
@@ -36,22 +39,55 @@ def Update_recivers(Recivers):
     for i in  range(len(Recivers)):
         Recivers[i].update()
 
-def Init_Recivers(N,ts,width,height):
-    Recivers = [0]*N
-    for i in range(0,N):
-        Recivers[i] = Reciver(random.randrange(0,width),random.randrange(0,height),ts)
-    print(str(Recivers))
-    return Recivers
+def Init_Recivers(ts):
+    # create receivers
+    recivers = [];
+    # place receivers around the shop
+    k = -1;
+    n_rows = math.ceil((S_YMAX - 2*R_Border) / (math.sqrt(3)/2*R_Range*R_Spacing));
+    n_cols = math.ceil((S_XMAX - 2*R_Border) / (R_Range*R_Spacing) + 0.5);
+    yplaceRange = np.arange(n_rows + 1) * ((S_YMAX - 2*R_Border) / n_rows) + R_Border;
+    xplaceRange = np.arange(n_cols + 1) * ((S_XMAX - 2*R_Border) / (n_cols + 0.5)) + R_Border;
+    
+    for yplace in yplaceRange:
+        k += 1;
+        for xplace in xplaceRange:
+            r = Reciver(ts);
+            if k % 2 == 1:
+                r.Pos[0] = xplace + ((S_XMAX - 2*R_Border) / (n_cols + 0.5))/2;
+            else:
+                r.Pos[0] = xplace;
+            r.Pos[1] = yplace;
+            recivers.append(r);
+    
+    return recivers
+
+def Init_Customers(N):
+    # create customers
+    customers = [];
+    for cust_idx in range(N):
+        p = Path()
+        c = Customer(p.path,cust_idx);
+        customers.append(c);
+    return customers
 
 
 def find_recivers(Recivers,cust_id):
     tmp = []
     for i in range(len(Recivers)):
-        print(type(Recivers[i].Data_result[-1]))
         if type(Recivers[i].Data_result[-1]) is tuple and Recivers[i].Data_result[-1][0] == cust_id:
             tmp.append(i)
         if len(tmp) == 3:
-            return tmp
+            r1_pos = Recivers[tmp[0]].Pos
+            r2_pos = Recivers[tmp[1]].Pos
+            r3_pos = Recivers[tmp[2]].Pos
+
+            if r1_pos[0] == r2_pos[0] and r1_pos[0] == r3_pos[0]:
+                tmp = tmp[0:-1]
+            elif r1_pos[1] == r2_pos[1] and r1_pos[1] == r3_pos[1]:
+                tmp = tmp[0:-1]
+            else:
+                return tmp
     return tmp
 
 def split_axis(data):
@@ -64,13 +100,10 @@ def split_axis(data):
 
 def calc_diff(path,est):
     tmp = []
-    for i in range(0,len(path[0])):
+    #for i in range(0,len(path[0])-1):
+    for i in range(0,len(est[0])):
         x_diff = path[0][i] - est[0][i]
         y_diff = path[1][i] - est[1][i]
-        
-        print("path: (%2.1f, %2.1f)" %(path[0][i],path[1][i]))
-        print("est: (%2.1f, %2.1f)" %(est[0][i],est[1][i]))
-        print("Error: " + str(np.sqrt(x_diff**2 + y_diff**2)) + "\n")
         tmp.append(np.sqrt(x_diff**2 + y_diff**2))
     return tmp
 
@@ -82,101 +115,167 @@ def get_reciver_pos(Recivers):
         y_tmp.append(Recivers[i].Pos[1])
     return [x_tmp,y_tmp]
 
-
-random.seed(2)
-STORE_HEIGHT = 20
-STORE_WIDTH = 20
-NUMBER_OF_RECIVERS = 30
-NUMBER_OF_CUSTOMERS = 1
-SIGNAL_RATE = 3 #How long time passes between signals
-SIGNAL_TIME = 2 #How long each signal lasts, transmission time
-SIGNAL_STRENGHT = 20 #Radius of reciver signaling space
-SIM_TIME = 20
-
-Recivers = Init_Recivers(NUMBER_OF_RECIVERS,SIGNAL_STRENGHT,STORE_HEIGHT,STORE_WIDTH)
-Customers = [Customer(random.sample(Path.path, 1),1)]
-
-time = 0
-time_axis = []
-
-
-## BEGIN SIMULATION ##
-print("%7.4f s: Customer 0 arraives" %(time))
-
-for i in range(0,SIM_TIME):
-    time += i
-    time_axis.append(time)
-    if Customers[0].END and not Customers[0].left:
-        print("Customer 0 leaves")
-        Customers[0].left = True
-
-    if Customers[0].is_signaling():
-        print("%7.4f s: Custmer 0 signals" %(time))
-        for j in range(0, NUMBER_OF_RECIVERS):
-            Recivers[j].append_signal(Customers[0].id,Customers[0].cur_pos )
+def ShowShop(customers, receivers, showReceivers = True):
     
-    # Perform the triliatation 
-    if not Customers[0].END and not Customers[0].is_signaling() and Customers[0].signal_cycle == SIGNAL_TIME - 1: # -1 ???
-        print("Performing trilateration")
-        reciver_index  = find_recivers(Recivers,Customers[0].id)
-        if len(reciver_index) ==  3:
-            r1,r2,r3 = reciver_index
-            Customers[0].append_est_pos(est_Pos(Recivers[r1],Recivers[r2],Recivers[r3]))
-            print("""%7.4f s: Customer 0 real pos: (%2.2f, %2.2f)
-           Customer 0 est pos: (%2.2f, %2.2f) """
-                %(time,Customers[0].cur_pos[0],Customers[0].cur_pos[1],
-                  Customers[0].est_pos[-1][0],Customers[0].est_pos[-1][1]))
-
-    # Update customers and recived data in recivers
-    Customers[0].move()
-    Update_recivers(Recivers)
-    Customers[0].update(SIGNAL_RATE, SIGNAL_TIME)
-
-print("END of simulation")
-
+    # plot
+    for c in customers:
+        plt.figure(dpi=1200);
+        plt.axis([0, S_XMAX, 0, S_YMAX])
+        path_x,path_y = split_axis(c.PATH)
+        plt.plot(path_x, path_y)
+    
+        # receivers
+        if showReceivers == True:
+            x = [];
+            y = [];
+            for r in receivers:
+                x.append(r.Pos[0]);
+                y.append(r.Pos[1]);
+            plt.scatter(x, y, marker='1', c = '#FF0000')
+        
+    
 
 
-## calculating the results from simulation and plot.##
-path_x,path_y = split_axis(Customers[0].PATH)
-est_x,est_y = split_axis(Customers[0].est_pos)
-residual_error = calc_diff([path_x,path_y],[est_x,est_y])
-reciver_pos_x, reciver_pos_y = get_reciver_pos(Recivers)
+if __name__ == "__main__":
 
-figure(1)
-plot(path_x,path_y,'-',est_x,est_y,'o',reciver_pos_x,reciver_pos_y,'x')
-xlabel("x coordinates")
-ylabel("y coordinates")
-legend(['Real val','Est val','Reciver'])
-
-figure(2)
-plot(time_axis[0:len(path_x)],path_x,'-',time_axis[0:len(est_x)],est_x,'o')
-xlabel("Time")
-ylabel("x coordinates")
-legend(['Real val','Est val'])
-
-figure(3)
-plot(time_axis[0:len(path_y)],path_y,'-',time_axis[0:len(est_y)],est_y,'o')
-xlabel("Time")
-ylabel("y coordinates")
-legend(['Real val','Est val'])
+    
+    Recivers = Init_Recivers(SIGNAL_STRENGHT)
+    Customers = Init_Customers(NUMBER_OF_CUSTOMERS)
 
 
-figure(4)
-plot(time_axis[0:len(residual_error)],residual_error)
-xlabel("Time")
-ylabel("Residual error")
+    time = 0
+    time_axis = []
 
 
+    ## BEGIN SIMULATION, reseloutin of sim is P_R ##
+    print("Simulating SmartCart with resoulution of" + str(P_R) + " s:")
+    print("\tNr. Customers: " + str(NUMBER_OF_CUSTOMERS))
+    print("\tNr. Recivers: " + str(len(Recivers)))
+    for i in range(0,P_Length):
+        time = i *P_R
+        time_axis.append(time)
+        for Customer in Customers:
 
-print("Mean residual error: " + str(np.mean(residual_error)))
-print("Max error: " + str(np.max(residual_error)))
+            if Customer.END and not Customer.left:
+                print("Customer " + str(Customer.id) + " leaves")
+                Customer.left = True
 
-##Print data of recivers, DEBUG!!##
-"""
-for i in range(len(Recivers)):
-    print(Recivers[i].Data_result)
-"""
-plt.show()
+            if Customer.is_signaling():
+                #print("%7.4f s: Custmer 0 signals" %(time))
+                for j in range(0, len(Recivers)):
+                    Recivers[j].append_signal(Customer.id,Customer.cur_pos )
+    
+            # Perform the triliatation 
+            if not Customer.END and not Customer.is_signaling() and Customer.signal_cycle == SIGNAL_TIME - 1: 
+                #print("Performing trilateration")
+                reciver_index  = find_recivers(Recivers,Customer.id)
+                if len(reciver_index) ==  3:
+                    r1,r2,r3 = reciver_index
+                    Customer.append_est_pos(est_Pos(Recivers[r1],Recivers[r2],Recivers[r3]))
+                    print("""%7.4f s: Customer %1.0f real pos: (%2.2f, %2.2f)
+              Customer %1.0f est pos: (%2.2f, %2.2f) """
+                        %(time,Customer.id,Customer.cur_pos[0],Customer.cur_pos[1],
+                            Customer.id, Customer.est_pos[-1][0],Customer.est_pos[-1][1]))
+
+            # Update customers and recived data in recivers
+            Customer.move()
+            Customer.update(SIGNAL_RATE, SIGNAL_TIME)
+        
+        Update_recivers(Recivers)
+
+    print("END of simulation")
+
+    #print(Recivers[0].Data_result)
+    i=0
+    ## calculating the results from simulation and plot.##
+    fig1, axs1 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
+    fig1.tight_layout()
+    
+    fig2, axs2 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
+    fig2.tight_layout()
+
+    fig3, axs3 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
+    fig3.tight_layout()
+
+    fig4, axs4 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
+    fig4.tight_layout()
+    
+    if len(Customers) == 1:
+
+        path_x,path_y = split_axis(Customers[0].PATH)
+        est_x,est_y = split_axis(Customers[0].est_pos)
+        residual_error = calc_diff([path_x,path_y],[est_x,est_y])
+        reciver_pos_x, reciver_pos_y = get_reciver_pos(Recivers)
+        
+        
+        axs1.plot(path_x[0:len(time_axis)],path_y[0:len(time_axis)],'-',est_x,est_y,'o',reciver_pos_x,reciver_pos_y,'x')
+        axs1.set_xlabel("x coordinates")
+        axs1.set_ylabel("y coordinates")
+        axs1.legend(['Real val','Est val','Reciver'])
+        axs1.set_title('Customer ' + str(Customers[0].id))
+        
+        
+        axs2.plot(time_axis,path_x[0:len(time_axis)],'-',time_axis,est_x,'o')
+        axs2.set_xlabel("Time")
+        axs2.set_ylabel("x coordinates")
+        axs2.legend(['Real val','Est val'])
+
+        
+        axs3.plot(time_axis,path_y[0:len(time_axis)],'-',time_axis,est_y,'o')
+        axs3.set_xlabel("Time")
+        axs3.set_ylabel("y coordinates")
+        axs3.legend(['Real val','Est val'])
+    
+
+        
+        axs4.plot(time_axis[0:len(residual_error)],residual_error,[0,np.max(time_axis)],[np.mean(residual_error)]*2)
+        axs4.set_xlabel("Time")
+        axs4.set_ylabel("Residual error")
+        axs4.legend(['Residual error','Mean Residual error'])
+
+        print("Customer: " + str(Customers[0].id))
+        print("\tMean residual error: " + str(np.mean(residual_error)))
+        print("\tMax error: " + str(np.max(residual_error)))
+    
+    else: 
+        for customer in Customers:
+            path_x,path_y = split_axis(customer.PATH)
+            est_x,est_y = split_axis(customer.est_pos)
+            residual_error = calc_diff([path_x,path_y],[est_x,est_y])
+            reciver_pos_x, reciver_pos_y = get_reciver_pos(Recivers)
+        
+        
+            axs1[i].plot(path_x[0:len(time_axis)],path_y[0:len(time_axis)],'-',est_x,est_y,'o',reciver_pos_x,reciver_pos_y,'x')
+            axs1[i].set_xlabel("x coordinates")
+            axs1[i].set_ylabel("y coordinates")
+            axs1[i].legend(['Real val','Est val','Reciver'])
+            axs1[i].set_title('Customer ' + str(customer.id))
+        
+        
+            axs2[i].plot(time_axis,path_x[0:len(time_axis)],'-',time_axis,est_x,'o')
+            axs2[i].set_xlabel("Time")
+            axs2[i].set_ylabel("x coordinates")
+            axs2[i].legend(['Real val','Est val'])
+
+        
+            axs3[i].plot(time_axis,path_y[0:len(time_axis)],'-',time_axis,est_y,'o')
+            axs3[i].set_xlabel("Time")
+            axs3[i].set_ylabel("y coordinates")
+            axs3[i].legend(['Real val','Est val'])
+    
+
+        
+            axs4[i].plot(time_axis[0:len(residual_error)],residual_error,[0,np.max(time_axis)],[np.mean(residual_error)]*2)
+            axs4[i].set_xlabel("Time")
+            axs4[i].set_ylabel("Residual error")
+            axs4[i].legend(['Residual error','Mean Residual error'])
+
+            print("Customer: " + str(customer.id))
+            print("\tMean residual error: " + str(np.mean(residual_error)))
+            print("\tMax error: " + str(np.max(residual_error)))
+            i += 1
+
+    plt.show()
 
 
 

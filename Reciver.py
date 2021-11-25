@@ -2,9 +2,9 @@ import numpy as np
 import random
 
 class Reciver:
-    def __init__(self,pos_x,pos_y, Signal_radius):
+    def __init__(self, Signal_radius):
         self.Data_result = []               #hold recived signals
-        self.Pos = (pos_x,pos_y)            #Position of reciver in world
+        self.Pos = [0,0]                    #Position of reciver in world
         self._Signal_radius = Signal_radius #How far the signal can be recived
         self._time_index = 0                #Index for data array logic 
 
@@ -25,7 +25,7 @@ class Reciver:
             if len(self.Data_result) == self._time_index:
                 self.Data_result += tmp
             else:
-                print("OVERLAP IN SIGNAL")
+                #print("OVERLAP IN SIGNAL")
                 self.Data_result[self._time_index] = 0
 
     def __str__(self):
@@ -55,21 +55,6 @@ class Reciver:
             self.Data_result.append(0)
             self._time_index += 1
 
-#
-# def drawCellTowers():
-#     x1 = int(str(Recivers)[2])
-#     y1 = int(str(Recivers)[5])
-#     x2 = int(str(Recivers)[10])
-#     y2 = int(str(Recivers)[13])
-#     x3 = int(str(Recivers)[18])
-#     y3 = int(str(Recivers)[21])
-#     x = random.randint(1, 4)
-#     y = random.randint(1, 4)
-#     # print(x, y)
-#     r1 = ((x - x1) ** 2 + (y - y1) ** 2) ** 0.5
-#     r2 = ((x - x2) ** 2 + (y - y2) ** 2) ** 0.5
-#     r3 = ((x - x3) ** 2 + (y - y3) ** 2) ** 0.5
-#     return x1,y1,r1,x2,y2,r2,x3,y3,r3
 
 def est_Pos(Reciver1,Reciver2,Reciver3):
     x1 = Reciver1.Pos[0]
@@ -110,11 +95,6 @@ def Init_Recivers(N,ts):
     print(str(Recivers))
     return Recivers
 
-"""
-def Append_signal_to_recivers(Recivers,Customer)
-    for i in range(len(Recivers)):
-        Recivers[i].append_signa(Customer.id, Customer.pos)
-"""
 
 if __name__ == "__main__":
     random.seed(2)
