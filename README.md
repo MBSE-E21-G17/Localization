@@ -4,7 +4,7 @@ a sound positioning system.
 
 # Install and Run
 
-The simulation is run using Python 2.7 --Python 3.6
+The simulation is run using Python 2.7 - Python 3.6
 However, the following pachages are needed to run the simulation:
 
 ~~~~
