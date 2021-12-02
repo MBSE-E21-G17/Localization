@@ -1,13 +1,14 @@
 import numpy as np
+import random as rnd
 
 class Customer:
-    def __init__(self, PATH,cust_id):
+    def __init__(self, PATH,cust_id,Signal_rate):
         self.PATH = PATH
         self.cur_pos = PATH[0]
         self.est_pos = [PATH[0]] #first estimation is at entrance
         self._path_ind = 0
         self.id = cust_id
-        self.signal_cycle = 0
+        self.signal_cycle = rnd.randint(0,Signal_rate)
         self.signaling = 0
         self.END = False
         self._time_index = 0  # Practicaly the same as path_ind
