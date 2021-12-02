@@ -34,8 +34,23 @@ class Reciver:
     def __repr__(self):
         return self.__str__()
 
-    def clear_signal(self, ts_1, ts_2):
-        pass
+    def clear_signal(self, signal_rate):
+        print(self.Data_result)
+        for i in range(len(self.Data_result)):
+            if type(self.Data_result[i]) is tuple:
+                print(i)
+                print("len: " + str(self._time_index))
+                cust_id = self.Data_result[i][0]
+                for k in range(0,signal_rate-1):
+                    print("k: " + str(k))
+                    if k+i > self._time_index-1:
+                        print("Break")
+                        break
+                    
+                    if self.Data_result[i+k][0] != cust_id:
+                        self.Data_result[i+k] = 0
+        print(self.Data_result)
+
 
     def _distance(self, cust_pos): 
         """
@@ -91,7 +106,7 @@ def Update_recivers(Recivers):
 def Init_Recivers(N,ts):
     Recivers = [0]*N
     for i in range(0,N):
-        Recivers[i] = Reciver(random.randrange(1,50),random.randrange(1,50),ts)
+        Recivers[i] = Reciver(ts)
     print(str(Recivers))
     return Recivers
 
@@ -106,8 +121,6 @@ if __name__ == "__main__":
 
     Recivers = Init_Recivers(N,SIGNAL_STRENGHT)
     m, y = est_Pos(Recivers[0],Recivers[1],Recivers[2])
-    print(m)
-    print(y)
     #Customers = Spawn_customer()
 
     cust1_signal_rate = 2

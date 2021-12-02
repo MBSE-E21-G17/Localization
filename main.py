@@ -1,7 +1,7 @@
 from Customer import *
 from Path import *
 from Reciver import *
-from matplotlib.pylab import (figure, plot, xlabel, ylabel, legend, title, subplots, show)
+from matplotlib.pylab import (figure, plot, xlabel, ylabel, legend, title, subplots, show, boxplot,bar)
 import random
 import time
 import matplotlib.pyplot as plt
@@ -30,10 +30,13 @@ def est_Pos(Reciver1,Reciver2,Reciver3):
     D = 2*x3 - 2*x2
     E = 2*y3 - 2*y2
     F = r2**2 - r3**2 - x2**2 + x3**2 - y2**2 + y3**2
-    
-    x0 = (C*E - F*B) / (E*A - B*D)
-    y0 = (C*D - A*F) / (B*D - A*E)
-    return x0, y0
+    try :
+        x0 = (C*E - F*B) / (E*A - B*D) + random.uniform(0,1)
+        y0 = (C*D - A*F) / (B*D - A*E) + random.uniform(0,1)
+        return x0, y0
+    except:
+        return inf,inf
+
 
 def Update_recivers(Recivers):
     for i in  range(len(Recivers)):
@@ -62,12 +65,12 @@ def Init_Recivers(ts):
     
     return recivers
 
-def Init_Customers(N):
+def Init_Customers(N,signal_rate):
     # create customers
     customers = [];
     for cust_idx in range(N):
         p = Path()
-        c = Customer(p.path,cust_idx);
+        c = Customer(p.path,cust_idx,signal_rate);
         customers.append(c);
     return customers
 
@@ -140,7 +143,7 @@ if __name__ == "__main__":
 
     
     Recivers = Init_Recivers(SIGNAL_STRENGHT)
-    Customers = Init_Customers(NUMBER_OF_CUSTOMERS)
+    Customers = Init_Customers(NUMBER_OF_CUSTOMERS,SIGNAL_RATE)
 
 
     time = 0
@@ -157,7 +160,7 @@ if __name__ == "__main__":
         for Customer in Customers:
 
             if Customer.END and not Customer.left:
-                print("Customer " + str(Customer.id) + " leaves")
+                #print("Customer " + str(Customer.id) + " leaves")
                 Customer.left = True
 
             if Customer.is_signaling():
@@ -182,103 +185,147 @@ if __name__ == "__main__":
             Customer.update(SIGNAL_RATE, SIGNAL_TIME)
         
         Update_recivers(Recivers)
-
+    
     print("END of simulation")
-
-    #print(Recivers[0].Data_result)
-    i=0
-    ## calculating the results from simulation and plot.##
-    fig1, axs1 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
-    fig1.tight_layout()
-    
-    fig2, axs2 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
-    fig2.tight_layout()
-
-    fig3, axs3 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
-    fig3.tight_layout()
-
-    fig4, axs4 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
-    fig4.tight_layout()
-    
-    if len(Customers) == 1:
-
-        path_x,path_y = split_axis(Customers[0].PATH)
-        est_x,est_y = split_axis(Customers[0].est_pos)
-        residual_error = calc_diff([path_x,path_y],[est_x,est_y])
-        reciver_pos_x, reciver_pos_y = get_reciver_pos(Recivers)
-        
-        
-        axs1.plot(path_x[0:len(time_axis)],path_y[0:len(time_axis)],'-',est_x,est_y,'o',reciver_pos_x,reciver_pos_y,'x')
-        axs1.set_xlabel("x coordinates")
-        axs1.set_ylabel("y coordinates")
-        axs1.legend(['Real val','Est val','Reciver'])
-        axs1.set_title('Customer ' + str(Customers[0].id))
-        
-        
-        axs2.plot(time_axis,path_x[0:len(time_axis)],'-',time_axis,est_x,'o')
-        axs2.set_xlabel("Time")
-        axs2.set_ylabel("x coordinates")
-        axs2.legend(['Real val','Est val'])
-
-        
-        axs3.plot(time_axis,path_y[0:len(time_axis)],'-',time_axis,est_y,'o')
-        axs3.set_xlabel("Time")
-        axs3.set_ylabel("y coordinates")
-        axs3.legend(['Real val','Est val'])
     
 
-        
-        axs4.plot(time_axis[0:len(residual_error)],residual_error,[0,np.max(time_axis)],[np.mean(residual_error)]*2)
-        axs4.set_xlabel("Time")
-        axs4.set_ylabel("Residual error")
-        axs4.legend(['Residual error','Mean Residual error'])
 
-        print("Customer: " + str(Customers[0].id))
-        print("\tMean residual error: " + str(np.mean(residual_error)))
-        print("\tMax error: " + str(np.max(residual_error)))
+    if len(Customers) < 5:
+        i=0
+        ## calculating the results from simulation and plot.##
+        fig1, axs1 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
+        fig1.tight_layout()
+        
+        fig2, axs2 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
+        fig2.tight_layout()
     
-    else: 
-        for customer in Customers:
-            path_x,path_y = split_axis(customer.PATH)
-            est_x,est_y = split_axis(customer.est_pos)
+        fig3, axs3 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
+        fig3.tight_layout()
+
+        fig4, axs4 = subplots(NUMBER_OF_CUSTOMERS, figsize=(10,10))
+        fig4.tight_layout()
+    
+        if len(Customers) == 1:
+
+            path_x,path_y = split_axis(Customers[0].PATH)
+            est_x,est_y = split_axis(Customers[0].est_pos)
             residual_error = calc_diff([path_x,path_y],[est_x,est_y])
             reciver_pos_x, reciver_pos_y = get_reciver_pos(Recivers)
         
         
+            axs1.plot(path_x[0:len(time_axis)],path_y[0:len(time_axis)],'-',est_x,est_y,'o',reciver_pos_x,reciver_pos_y,'x')
+            axs1.set_xlabel("x coordinates")
+            axs1.set_ylabel("y coordinates")
+            axs1.legend(['Real val','Est val','Reciver'])
+            axs1.set_title('Customer ' + str(Customers[0].id))
+        
+        
+            axs2.plot(time_axis,path_x[0:len(time_axis)],'-',time_axis,est_x,'o')
+            axs2.set_xlabel("Time")
+            axs2.set_ylabel("x coordinates")
+            axs2.legend(['Real val','Est val'])
+
+        
+            axs3.plot(time_axis,path_y[0:len(time_axis)],'-',time_axis,est_y,'o')
+            axs3.set_xlabel("Time")
+            axs3.set_ylabel("y coordinates")
+            axs3.legend(['Real val','Est val'])
+    
+
+        
+            axs4.plot(time_axis[0:len(residual_error)],residual_error,[0,np.max(time_axis)],[np.mean(residual_error)]*2)
+            axs4.set_xlabel("Time")
+            axs4.set_ylabel("Residual error")
+            axs4.legend(['Residual error','Mean Residual error'])
+
+            print("Customer: " + str(Customers[0].id))
+            print("\tMean residual error: " + str(np.mean(residual_error)))
+            print("\tMax error: " + str(np.max(residual_error)))
+    
+        else:
+            for customer in Customers:
+                path_x,path_y = split_axis(customer.PATH)
+                est_x,est_y = split_axis(customer.est_pos)
+                residual_error = calc_diff([path_x,path_y],[est_x,est_y])
+                reciver_pos_x, reciver_pos_y = get_reciver_pos(Recivers)
+        
+        
+                axs1[i].plot(path_x[0:len(time_axis)],path_y[0:len(time_axis)],'-',est_x,est_y,'o',reciver_pos_x,reciver_pos_y,'x')
+                axs1[i].set_xlabel("x coordinates")
+                axs1[i].set_ylabel("y coordinates")
+                axs1[i].legend(['Real val','Est val','Reciver'])
+                axs1[i].set_title('Customer ' + str(customer.id))
+        
+        
+                axs2[i].plot(time_axis,path_x[0:len(time_axis)],'-',time_axis,est_x,'o')
+                axs2[i].set_xlabel("Time")
+                axs2[i].set_ylabel("x coordinates")
+                axs2[i].legend(['Real val','Est val'])
+
+        
+                axs3[i].plot(time_axis,path_y[0:len(time_axis)],'-',time_axis,est_y,'o')
+                axs3[i].set_xlabel("Time")
+                axs3[i].set_ylabel("y coordinates")
+                axs3[i].legend(['Real val','Est val'])
+    
+
+        
+                axs4[i].plot(time_axis[0:len(residual_error)],residual_error,[0,np.max(time_axis)],[np.mean(residual_error)]*2)
+                axs4[i].set_xlabel("Time")
+                axs4[i].set_ylabel("Residual error")
+                axs4[i].legend(['Residual error','Mean Residual error'])
+
+                print("Customer: " + str(customer.id))
+                print("\tMean residual error: " + str(np.mean(residual_error)))
+                print("\tMax error: " + str(np.max(residual_error)))
+                i += 1
+    else:
+        data = []
+        nr_of_est_points = []
+        cust_id = range(1,len(Customers)+1)
+        for cust in Customers:
+            path_x,path_y = split_axis(cust.PATH)
+            est_x,est_y = split_axis(cust.est_pos)
+            residual_error = calc_diff([path_x,path_y],[est_x,est_y])
+            data.append(residual_error)
+            
+            nr_of_est_points.append(len(set(cust.est_pos)))
+
+        
+        best_cust_indx = nr_of_est_points.index(max(nr_of_est_points))
+        worst_cust_indx = nr_of_est_points.index(min(nr_of_est_points))
+    
+        best_cust = Customers[best_cust_indx]
+        worst_cust = Customers[worst_cust_indx]
+        
+        fig = figure(figsize = (10,7))
+        boxplot(data)
+        xlabel("Customers")
+        ylabel("Residual error")
+
+        fig = figure(figsize = (10,7))
+        bar(cust_id,nr_of_est_points)
+        title("Number of estimated positions")
+        xlabel("Customers")
+        ylabel("Estimated positions")
+
+
+        fig1, axs1 = subplots(2, figsize=(10,10))
+        fig1.tight_layout()
+        
+        i = 0
+        title = ["Best customer", "Worst customer"]
+        for cust in [best_cust, worst_cust]:
+            path_x,path_y = split_axis(cust.PATH)
+            est_x,est_y = split_axis(cust.est_pos)
+            reciver_pos_x, reciver_pos_y = get_reciver_pos(Recivers)
+
             axs1[i].plot(path_x[0:len(time_axis)],path_y[0:len(time_axis)],'-',est_x,est_y,'o',reciver_pos_x,reciver_pos_y,'x')
             axs1[i].set_xlabel("x coordinates")
             axs1[i].set_ylabel("y coordinates")
             axs1[i].legend(['Real val','Est val','Reciver'])
-            axs1[i].set_title('Customer ' + str(customer.id))
-        
-        
-            axs2[i].plot(time_axis,path_x[0:len(time_axis)],'-',time_axis,est_x,'o')
-            axs2[i].set_xlabel("Time")
-            axs2[i].set_ylabel("x coordinates")
-            axs2[i].legend(['Real val','Est val'])
-
-        
-            axs3[i].plot(time_axis,path_y[0:len(time_axis)],'-',time_axis,est_y,'o')
-            axs3[i].set_xlabel("Time")
-            axs3[i].set_ylabel("y coordinates")
-            axs3[i].legend(['Real val','Est val'])
-    
-
-        
-            axs4[i].plot(time_axis[0:len(residual_error)],residual_error,[0,np.max(time_axis)],[np.mean(residual_error)]*2)
-            axs4[i].set_xlabel("Time")
-            axs4[i].set_ylabel("Residual error")
-            axs4[i].legend(['Residual error','Mean Residual error'])
-
-            print("Customer: " + str(customer.id))
-            print("\tMean residual error: " + str(np.mean(residual_error)))
-            print("\tMax error: " + str(np.max(residual_error)))
+            axs1[i].set_title(title[i])
             i += 1
 
     plt.show()
-
-
-
-
-
 
