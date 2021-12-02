@@ -24,13 +24,13 @@ P_DirMin = -0.98*math.pi; # max left angle
 P_DirMax = math.pi; # max right angle
 
 # Receiver
-R_Range = 10; # maximum range in meters
+R_Range = 25; # maximum range in meters
 R_Spacing = 0.5; # percentage of maximum range
 R_Res = 0.001; # resolution in sec 0.001s = 1ms
 R_Border = 1; # border width [m] where there are no receivers
 
 # Customers
-NUMBER_OF_CUSTOMERS = 1; # number of customers
-SIGNAL_RATE = 300 #How long time passes between signals, ms
-SIGNAL_TIME = 200 #How ling each signal lasts, transmisson time, ms
+NUMBER_OF_CUSTOMERS = 8; # number of customers
+SIGNAL_RATE = 600 #How long time passes between signals, ms
+SIGNAL_TIME = 300 #How ling each signal lasts, transmisson time, ms
 SIGNAL_STRENGHT = 20 #Radius of reciver signaling space
