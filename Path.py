@@ -7,7 +7,7 @@ from  parameters import *
 
 class Path:
     def __init__(self):
-	self.path = self._CreateRandomPath(True)
+	self.path = self._CreateRandomPath()
 
     def _CreateRandomPath(self, startAtEntrance = False):
         

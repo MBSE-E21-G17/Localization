@@ -8,7 +8,7 @@ class Customer:
         self.est_pos = [PATH[0]] #first estimation is at entrance
         self._path_ind = 0
         self.id = cust_id
-        self.signal_cycle = rnd.randint(0,Signal_rate)
+        self.signal_cycle = int(rnd.randrange(0,Signal_rate,1))
         self.signaling = 0
         self.END = False
         self._time_index = 0  # Practicaly the same as path_ind
@@ -29,6 +29,7 @@ class Customer:
             self.est_pos.append(self.est_pos[self._time_index-1])
 
     def update(self, Signal_rate, Signal_time):
+        Signal_rate /= 10
         if not self.END:
             self.signal_cycle = (self.signal_cycle + 1) % Signal_rate
 

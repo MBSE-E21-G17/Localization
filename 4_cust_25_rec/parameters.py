@@ -30,7 +30,7 @@ R_Res = 0.001; # resolution in sec 0.001s = 1ms
 R_Border = 1; # border width [m] where there are no receivers
 
 # Customers
-NUMBER_OF_CUSTOMERS = 500; # number of customers
+NUMBER_OF_CUSTOMERS = 4; # number of customers
 SIGNAL_RATE = 2000.0  #How long time passes between signals, ms
 SIGNAL_TIME = 40  #How ling each signal lasts, transmisson time, ms
 SIGNAL_STRENGHT = 10 #Radius of reciver signaling space
