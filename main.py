@@ -283,45 +283,50 @@ if __name__ == "__main__":
                 print("\tMean residual error: " + str(np.mean(residual_error)))
                 print("\tMax error: " + str(np.max(residual_error)))
                 i += 1
-    else:
-        data = []
-        nr_of_est_points = []
-        cust_id = range(1,len(Customers)+1)
-        for cust in Customers:
-            path_x,path_y = split_axis(cust.PATH)
-            est_x,est_y = split_axis(cust.est_pos)
-            residual_error = calc_diff([path_x,path_y],[est_x,est_y])
-            data.append(residual_error)
+
+                
+    data = []
+    nr_of_est_points = []
+    cust_id = range(1,len(Customers)+1)
+    for cust in Customers:
+        path_x,path_y = split_axis(cust.PATH)
+        est_x,est_y = split_axis(cust.est_pos)
+        residual_error = calc_diff([path_x,path_y],[est_x,est_y])  
+        data.append(residual_error)
             
-            nr_of_est_points.append(len(set(cust.est_pos)))
+        nr_of_est_points.append(len(set(cust.est_pos)))
 
         
-        best_cust_indx = nr_of_est_points.index(max(nr_of_est_points))
-        worst_cust_indx = nr_of_est_points.index(min(nr_of_est_points))
+    best_cust_indx = nr_of_est_points.index(max(nr_of_est_points))
+    worst_cust_indx = nr_of_est_points.index(min(nr_of_est_points))
     
-        best_cust = Customers[best_cust_indx]
-        worst_cust = Customers[worst_cust_indx]
+    best_cust = Customers[best_cust_indx]
+    worst_cust = Customers[worst_cust_indx]
         
-        fig = figure(figsize = (10,7))
-        boxplot(data)
-        xlabel("Customers")
-        ylabel("Residual error [m]")
+    fig = figure(figsize = (10,7))
+    boxplot(data)
+    xlabel("Customers")
+    ylabel("Residual error [m]")
 
-        fig = figure(figsize = (10,7))
-        bar(cust_id,nr_of_est_points)
-        title("Number of estimated positions")
-        xlabel("Customers")
-        ylabel("Estimated positions")
+    fig = figure(figsize = (10,7))
+    bar(cust_id,nr_of_est_points)
+    title("Number of estimated positions")
+    xlabel("Customers")
+    ylabel("Estimated positions")
 
-        fig = figure(figsize = (10,7))
-        bar(cust_id,((np.array(nr_of_est_points)-1)/(P_Time*1000/SIGNAL_RATE))*100)
-        title("Ratio of est. pos and nr. of sent signals")
-        xlabel("Customers")
-        ylabel("Ratio [%]")
-
+    fig = figure(figsize = (10,7))
+    bar(cust_id,((np.array(nr_of_est_points)-1)/(P_Time*1000/SIGNAL_RATE))*100)
+    title("Ratio of est. pos and nr. of sent signals")
+    xlabel("Customers")
+    ylabel("Ratio [%]")
+    
+    ratio = ((np.array(nr_of_est_points)-1)/(P_Time*1000/SIGNAL_RATE))*100
+    print("Mean ratio: " + str(sum(ratio)/len(Customers)))
+    
+    if len(Customers) > 2:
         fig1, axs1 = subplots(2, figsize=(10,10))
         fig1.tight_layout()
-        
+    
         i = 0
         title = ["Best customer", "Worst customer"]
         for cust in [best_cust, worst_cust]:
@@ -335,6 +340,7 @@ if __name__ == "__main__":
             axs1[i].legend(['Real val','Est val','Reciver'])
             axs1[i].set_title(title[i])
             i += 1
+
 
     plt.show()
 
