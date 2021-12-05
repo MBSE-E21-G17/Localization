@@ -33,7 +33,7 @@ The parameters in the shop group hold the information of the desired shop setup,
 #### Path ####
 The parameters in the path category are for the random generation of the paths. So in this category, there are parameters like the path time and gaussian distribution of the path generation.
 
-#### Recivers ####
+#### Receivers ####
 The parameters in this category are the settings for spawning the receivers in the shop, for example, the range of the receivers and spacing between each receiver.
 
 #### Customers ####
@@ -41,7 +41,7 @@ The parameters in this group are for the settings of the customers in the simula
 
 *Note: parameter "SIGNAL_RATE" needs to be a float*
 
-#### Recomended parameters ####
+#### Recommended parameters ####
 
 The parameters that have the most considerable effect on the simulation are the parameters for the Receivers, that is, R_range and R_spacing,
 and the parameters for the customers, NUMBER_OF_CUSTOMERS, SIGNAL_RATE, SIGNAL_TIME & SIGNAL_STRENGTH.
