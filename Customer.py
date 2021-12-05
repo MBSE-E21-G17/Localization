@@ -1,17 +1,18 @@
 import numpy as np
 import random as rnd
 
+
 class Customer:
-    def __init__(self, PATH,cust_id,Signal_rate):
+    def __init__(self, PATH, cust_id, Signal_rate):
         self.PATH = PATH
         self.cur_pos = PATH[0]
-        self.est_pos = [PATH[0]] #first estimation is at entrance
+        self.est_pos = [PATH[0]]  # first estimation is at entrance
         self._path_ind = 0
         self.id = cust_id
-        self.signal_cycle = int(rnd.randrange(0,Signal_rate,1))
+        self.signal_cycle = int(rnd.randrange(0, Signal_rate, 1))
         self.signaling = 0
         self.END = False
-        self._time_index = 0  # Practicaly the same as path_ind
+        self._time_index = 0  # Practically the same as path_ind
         self.left = False
 
     def move(self):
@@ -21,12 +22,12 @@ class Customer:
         else:
             self.END = True
 
-    def append_est_pos(self,pos):
+    def append_est_pos(self, pos):
         tmp = [pos]
         if np.isfinite(pos[0]) and np.isfinite(pos[1]):
-            self.est_pos += tmp #append to end of array
+            self.est_pos += tmp  # append to end of array
         else:
-            self.est_pos.append(self.est_pos[self._time_index-1])
+            self.est_pos.append(self.est_pos[self._time_index - 1])
 
     def update(self, Signal_rate, Signal_time):
         Signal_rate /= 10
@@ -38,12 +39,9 @@ class Customer:
 
             if self._time_index < len(self.est_pos):
                 self._time_index += 1
-            else: # Estemated position has not been calculated
-                self.est_pos.append(self.est_pos[self._time_index-1])
+            else:  # Estimated position has not been calculated
+                self.est_pos.append(self.est_pos[self._time_index - 1])
                 self._time_index += 1
-
 
     def is_signaling(self):
         return (self.signal_cycle == 0 or self.signaling > 0) and not self.END
-      
-    
